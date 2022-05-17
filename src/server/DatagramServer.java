@@ -1,32 +1,50 @@
 package server;
 
-import creator.PersonCreator;
-import exceptions.IllegalFieldsException;
-import list.ListSaver;
-import list.PersonList;
-import parser.Parser;
+import server.listfiller.PersonCreator;
+import util.exceptions.IllegalFieldsException;
+import server.list.ListSaver;
+import server.list.PersonList;
+import server.listfiller.Parser;
 import sun.misc.Signal;
-import util.Port;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.channels.DatagramChannel;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class DatagramServer {
     public static final Logger logger = Logger.getLogger(DatagramServer.class.getSimpleName());
+    public static InetSocketAddress address;
+
+
     PersonList personList;
 
     public DatagramChannel startServer() {
-        DatagramChannel server = null;
-        InetSocketAddress address = new InetSocketAddress("localhost", Port.port);
-        try {
-            server = DatagramChannelBuilder.bindChannel(address);
-            server.configureBlocking(false);
-            logger.info("Bound successfully");
-        } catch (IOException e) {
-            logger.info("Binding error");
-            System.exit(-1);
+        DatagramChannel channel;
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            try {
+                System.out.println("Write your host, example: " + InetAddress.getLocalHost().toString().substring(26));
+                InetAddress host = InetAddress.getByName(scanner.nextLine());
+                System.out.println("Write your port");
+                int port = Integer.parseInt(scanner.nextLine());
+                address = new InetSocketAddress(host, port);
+                channel = DatagramChannelBuilder.bindChannel(address);
+                channel.configureBlocking(false);
+                System.out.println("Bound successfully");
+                break;
+            } catch (UnknownHostException e) {
+                System.out.println("Illegal host");
+            } catch (NumberFormatException e) {
+                System.out.println("Illegal port");
+            } catch (IllegalArgumentException e){
+                System.out.println("Port out of legal range");
+            } catch (IOException e) {
+                System.out.println("Binding error");
+            }
         }
         personList = new PersonList();
         PersonCreator personCreator = new PersonCreator(personList);
@@ -41,11 +59,11 @@ public class DatagramServer {
             e.printStackTrace();
         }
 
-        setupShutDownWork(personList,server);
-        setupSignalHandler(personList,server);
+        setupShutDownWork(personList,channel);
+        setupSignalHandler(personList,channel);
 
         logger.info("Server started at #" + address);
-        return server;
+        return channel;
     }
 
 
@@ -81,6 +99,11 @@ public class DatagramServer {
             try {
                 messageProcessor.receiveMessage(channel);
             } catch (IOException e) {
+                try {
+                    channel.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 e.printStackTrace();
             }
         }

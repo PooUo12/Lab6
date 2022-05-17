@@ -1,19 +1,23 @@
 package server;
 
-import commands.Command;
-import list.PersonList;
-import util.Port;
-import util.Request;
-import util.Response;
-import util.Serializer;
+import util.commands.Command;
+import server.list.PersonList;
+
+import util.sendingUtils.Request;
+import util.sendingUtils.Response;
+import util.sendingUtils.Serializer;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static server.DatagramServer.address;
+
 
 public class MessageProcessor {
     List<Object> args = null;
@@ -23,12 +27,12 @@ public class MessageProcessor {
         this.personList = personList;
     }
 
-    public void receiveMessage(DatagramChannel server) throws IOException {
+    public void receiveMessage(DatagramChannel channel) throws IOException {
         SocketAddress remoteAdd = null;
-        ByteBuffer buffer = ByteBuffer.allocate(Port.size);
+        ByteBuffer buffer = ByteBuffer.allocate(Constants.size);
         while (remoteAdd == null){
             try {
-                remoteAdd = server.receive(buffer);
+                remoteAdd = channel.receive(buffer);
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -36,7 +40,13 @@ public class MessageProcessor {
         }
         Response response = extractMessage(buffer);
         ByteBuffer answer = ByteBuffer.wrap(Serializer.serializer(response).toByteArray());
-        sendMessage(answer, remoteAdd, server);
+        sendMessage(answer, remoteAdd, channel);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private Response extractMessage(ByteBuffer buffer) {
@@ -53,7 +63,8 @@ public class MessageProcessor {
             args.add(0, personList);
         }
         DatagramServer.logger.info("Client sent: " + request.getCommand().toString());
-        Response response = command.execute(args);
+        Response response;
+        response = command.execute(args);
         return response;
     }
 
@@ -68,8 +79,16 @@ public class MessageProcessor {
                 Thread.sleep(100);
             }
             DatagramServer.logger.info("Response was successfully sent");
-        } catch (IOException | InterruptedException e) {
-            DatagramServer.logger.info("Error sending packet to client");
+        } catch (ClosedChannelException e){
+            DatagramServer.logger.info("Unable to send packet because channel is closed");
+        } catch (SecurityException e) {
+            DatagramServer.logger.info("Security manager doesn't allow to send packet");
         }
+        catch (IOException e) {
+            DatagramServer.logger.info("Error sending packet to client");
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
     }
 }
