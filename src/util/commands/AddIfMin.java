@@ -1,13 +1,13 @@
 package util.commands;
 
-import server.list.PersonList;
 import util.person.Person;
-import server.DatagramServer;
 import util.sendingUtils.Response;
+import server.DatagramServer;
+import server.list.PersonList;
 
 import java.util.List;
 
-public class AddIfMin extends Command{
+public class AddIfMin extends Command {
 
     public Response execute(List<Object> params){
         String title = "";

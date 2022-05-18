@@ -1,9 +1,9 @@
 package util.commands;
 
-import server.list.PersonList;
 import util.person.Person;
-import server.DatagramServer;
 import util.sendingUtils.Response;
+import server.DatagramServer;
+import server.list.PersonList;
 
 import java.util.List;
 import java.util.stream.Collectors;

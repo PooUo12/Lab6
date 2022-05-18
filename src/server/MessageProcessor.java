@@ -16,8 +16,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static server.DatagramServer.address;
-
 
 public class MessageProcessor {
     List<Object> args = null;
@@ -41,11 +39,6 @@ public class MessageProcessor {
         Response response = extractMessage(buffer);
         ByteBuffer answer = ByteBuffer.wrap(Serializer.serializer(response).toByteArray());
         sendMessage(answer, remoteAdd, channel);
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
     }
 

@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class CreateFromConsoleParser {
 
 
-    private static final String PERSON_FIELDS = "util.person name, coordinates x, coordinates y, util.person height, util.person weight, util.person passportID, util.person color,location x, location y, location z, location name";
+    private static final String PERSON_FIELDS = "server.util.person name, coordinates x, coordinates y, server.util.person height, server.util.person weight, server.util.person passportID, server.util.person color,location x, location y, location z, location name";
     private static final String EXAMPLE = "igor,12,12,189,90,2222222222,red,12,12,12,church";
 
     public Person parse(Scanner in) {
@@ -54,7 +54,9 @@ public class CreateFromConsoleParser {
             hairColor = colorRecognizer.stringToColor();
             if (hairColor != null){
                 break;
-            } else {
+            } else if(color.equals("")) {
+                break;
+            }else{
                 System.out.println("Incorrect color");
             }
         }
@@ -128,11 +130,13 @@ public class CreateFromConsoleParser {
     private String stringCheck(Scanner in, String output){
         while (true){
             System.out.println("Write "+ output);
-            if (output.equals(" util.person color")){
+            if (output.equals(" server.util.person color")){
                 System.out.println("Available colors: red, yellow, orange, white");
+                String next = in.nextLine();
+                return next;
             }
             String next = in.nextLine();
-            if (next != null){
+            if (next != null && !next.equals("")){
                 return next;
             } else {
                 System.out.println("Empty input,that's impossible , try again");

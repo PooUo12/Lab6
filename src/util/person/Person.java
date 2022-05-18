@@ -8,7 +8,7 @@ public class Person implements Comparable<Person>, Serializable {
     private int id;
     private final String name;
     private final Coordinates coordinates;
-    private java.time.ZonedDateTime creationDate;
+    private ZonedDateTime creationDate;
     private final int height;
     private final Double weight;
     private final String passportID;

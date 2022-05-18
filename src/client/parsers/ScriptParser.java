@@ -15,7 +15,7 @@ public class ScriptParser {
     private final CommandsParser commandsParser;
     private int i = 0;
     /**
-     * @param commandsParser Parser and executor of util.commands
+     * @param commandsParser Parser and executor of server.util.commands
      */
     public ScriptParser(CommandsParser commandsParser){
         this.commandsParser = commandsParser;

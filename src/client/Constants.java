@@ -1,7 +1,7 @@
 package client;
 
 public final class Constants {
-    public static final String FIRST_LINE = "id, util.person name, coordinates x, coordinates y, creationDate, util.person height, util.person weight, util.person passportID, util.person color,location x, location y, location z, location name";
+    public static final String FIRST_LINE = "id, server.util.person name, coordinates x, coordinates y, creationDate, server.util.person height, server.util.person weight, server.util.person passportID, server.util.person color,location x, location y, location z, location name";
     public static final String HELP = "help";
     public static final String INFO = "info";
     public static final String SHOW = "show";

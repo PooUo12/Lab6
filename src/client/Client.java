@@ -25,7 +25,9 @@ public class Client {
 
     public void sender(byte[] arr){
         Response response = this.connection(arr);
-        System.out.println(response);
+        if (response != null) {
+            System.out.println(response);
+        }
 
 
     }
@@ -33,9 +35,9 @@ public class Client {
     private Response connection(byte[] arr) {
         byte[] arr1 = Constants.arr;
         Response response = null;
-        try {
-            ds = new DatagramSocket();
+        try (DatagramSocket ds = new DatagramSocket()) {
             dp = new DatagramPacket(arr, arr.length, host, port);
+            ds.setSoTimeout(5000);
             ds.send(dp);
             dp = new DatagramPacket(arr1, arr1.length);
             ds.receive(dp);
@@ -49,7 +51,6 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ds.close();
         return response;
     }
 
